@@ -3,7 +3,7 @@ pipeline {
 
     environment {
         registry = "rocastillou/certdevops" 
-        registryCredential = 'dockerhub_cred'
+        registryCredential = 'dockerhub'
         dockerImage = ''
         branchName = ''
         version = ''
