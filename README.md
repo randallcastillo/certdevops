@@ -1,8 +1,9 @@
-# certdevops
-Certificación DevOps UCreativa
-
-## What You Will build
-A sample RESTful web service with Spring Boot Actuator.
+# CI/CD Environment
+### DevOps Specialist Certification
+### TechGround, UCreativa
+---
+## The Service
+This is a RESTful web service with Spring Boot Actuator.
 The service accepts the following HTTP GET request:
 
 ```
