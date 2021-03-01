@@ -27,10 +27,10 @@ class CertdevopsApplicationTests {
 	private int mgt;
 
 	@Autowired
-	private TestRestTemplate testRestTemplate;
+	private HomeController controller;
 
 	@Autowired
-	private HomeController controller;
+	private TestRestTemplate testRestTemplate;
 
 	@Test
 	public void contextLoads_HomeController() throws Exception {
@@ -40,8 +40,8 @@ class CertdevopsApplicationTests {
 	@Test
 	public void shouldReturn200WhenSendingRequestToController() throws Exception {
 		@SuppressWarnings("rawtypes")
-		ResponseEntity<Map> entity = this.testRestTemplate
-				.getForEntity("http://localhost:" + this.port + "/hello-world", Map.class);
+		ResponseEntity<Map> entity = this.testRestTemplate.getForEntity("http://localhost:" + this.port + "/greet",
+				Map.class);
 
 		then(entity.getStatusCode()).isEqualTo(HttpStatus.OK);
 	}
