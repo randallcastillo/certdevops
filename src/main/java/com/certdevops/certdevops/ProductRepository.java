@@ -1,10 +1,11 @@
 package com.certdevops.certdevops;
 
-import org.springframework.data.jpa.repository.JpaRepository;
+//import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.repository.CrudRepository;
 
 /**
- * Spring Data JPA will generate implementation code for the most common CRUD operations.
+ * This will be AUTO IMPLEMENTED by Spring into a Bean called userRepository
  */
-public interface ProductRepository extends JpaRepository<Product, Integer> {
+public interface ProductRepository extends CrudRepository<Product, Integer> {
  
 }

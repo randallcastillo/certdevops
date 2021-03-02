@@ -8,18 +8,31 @@ import org.springframework.http.*;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
+@RequestMapping("/products")
 public class ProductController {
 
-    @Autowired
     private ProductService service;
 
-    // RESTful API methods for Retrieval operations
-    @GetMapping("/products")
-    public List<Product> list() {
-        return service.listAll();
+    @Autowired
+    public ProductController(ProductService productService) {
+        this.service = productService;
     }
 
-    @GetMapping("/products/{id}")
+
+    @GetMapping(path = "/hello")
+    public String sayHello() {
+        return "Hello Products!";
+    }
+
+    // RESTful API methods for Retrieval operations
+    @GetMapping
+    public List<Product> list() {
+        List<Product> result = new ArrayList<>();
+        service.listAll().forEach(result::add);
+        return result;
+    }
+
+    @GetMapping(path = "/{id}")
     public ResponseEntity<Product> get(@PathVariable Integer id) {
         try {
             Product product = service.get(id);
@@ -30,13 +43,14 @@ public class ProductController {
     }
 
     // RESTful API method for Create operation
-    @PostMapping("/products")
+    @PostMapping
+    @ResponseStatus(HttpStatus.CREATED)
     public void add(@RequestBody Product product) {
         service.save(product);
     }
 
     // RESTful API method for Update operation
-    @PutMapping("/products/{id}")
+    @PutMapping(path = "/{id}")
     public ResponseEntity<?> update(@RequestBody Product product, @PathVariable Integer id) {
         try {
             Product existProduct = service.get(id);
@@ -48,7 +62,7 @@ public class ProductController {
     }
 
     // RESTful API method for Delete operation
-    @DeleteMapping("/products/{id}")
+    @DeleteMapping(path = "/{id}")
     public void delete(@PathVariable Integer id) {
         service.delete(id);
     }

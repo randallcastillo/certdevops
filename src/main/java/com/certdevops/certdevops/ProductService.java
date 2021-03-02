@@ -1,6 +1,7 @@
 package com.certdevops.certdevops;
 
 import java.util.List;
+import java.util.Optional;
 
 import javax.transaction.Transactional;
 
@@ -11,19 +12,30 @@ import org.springframework.stereotype.Service;
 @Transactional
 public class ProductService {
 
-    @Autowired
     private ProductRepository repo;
 
-    public List<Product> listAll() {
+    @Autowired
+    public ProductService (ProductRepository productRepository) {
+        this.repo = productRepository;
+    }
+
+    public Iterable<Product> listAll() {
         return repo.findAll();
     }
 
-    public void save(Product product) {
-        repo.save(product);
+    public Product save(Product product) {
+        //repo.save(product);
+        return repo.save(product);
     }
 
     public Product get(Integer id) {
-        return repo.findById(id).get();
+        Product product = null;
+        Optional<Product> prodResponse = repo.findById(id);
+
+        if (prodResponse.isPresent()) {
+            product = prodResponse.get();
+        }
+        return product;
     }
 
     public void delete(Integer id) {
