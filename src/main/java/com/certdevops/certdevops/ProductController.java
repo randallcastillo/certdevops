@@ -16,12 +16,6 @@ public class ProductController {
         this.service = productService;
     }
 
-
-    @GetMapping(path = "/hello")
-    public String sayHello() {
-        return "Hello Products!";
-    }
-
     // RESTful API methods for Retrieval operations
     @GetMapping
     public List<Product> list() {
