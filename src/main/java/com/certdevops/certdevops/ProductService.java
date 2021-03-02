@@ -1,10 +1,7 @@
 package com.certdevops.certdevops;
 
-import java.util.List;
 import java.util.Optional;
-
 import javax.transaction.Transactional;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -23,8 +20,11 @@ public class ProductService {
         return repo.findAll();
     }
 
-    public Product save(Product product) {
-        //repo.save(product);
+    public Product save(String name, float price) {
+        return repo.save(new Product(name, price));
+    }
+
+    public Product update(Product product) {
         return repo.save(product);
     }
 

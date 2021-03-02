@@ -33,25 +33,23 @@ class CertdevopsApplicationTests {
 	private TestRestTemplate testRestTemplate;
 
 	@Test
-	public void contextLoads_HomeController() throws Exception {
+	void contextLoads_HomeController() throws Exception {
 		assertThat(controller).isNotNull();
 	}
 
 	@Test
-	public void shouldReturn200WhenSendingRequestToController() throws Exception {
+	void shouldReturn200WhenSendingRequestToController() throws Exception {
 		@SuppressWarnings("rawtypes")
 		ResponseEntity<Map> entity = this.testRestTemplate.getForEntity("http://localhost:" + this.port + "/greet",
 				Map.class);
-
 		then(entity.getStatusCode()).isEqualTo(HttpStatus.OK);
 	}
 
 	@Test
-	public void shouldReturn200WhenSendingRequestToManagementEndpoint() throws Exception {
+	void shouldReturn200WhenSendingRequestToManagementEndpoint() throws Exception {
 		@SuppressWarnings("rawtypes")
 		ResponseEntity<Map> entity = this.testRestTemplate
 				.getForEntity("http://localhost:" + this.mgt + "/actuator/info", Map.class);
-
 		then(entity.getStatusCode()).isEqualTo(HttpStatus.OK);
 	}
 

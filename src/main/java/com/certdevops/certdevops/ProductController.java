@@ -1,10 +1,8 @@
 package com.certdevops.certdevops;
 
 import java.util.*;
-
 import org.springframework.beans.factory.annotation.*;
 import org.springframework.http.*;
-
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -36,25 +34,27 @@ public class ProductController {
     public ResponseEntity<Product> get(@PathVariable Integer id) {
         try {
             Product product = service.get(id);
-            return new ResponseEntity<Product>(product, HttpStatus.OK);
+            return new ResponseEntity<>(product, HttpStatus.OK);
         } catch (NoSuchElementException e) {
-            return new ResponseEntity<Product>(HttpStatus.NOT_FOUND);
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
     }
 
     // RESTful API method for Create operation
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    public void add(@RequestBody Product product) {
-        service.save(product);
+    public void add(@RequestBody ProductDto productDto) {
+        service.save(productDto.getName(), productDto.getPrice());
     }
 
     // RESTful API method for Update operation
     @PutMapping(path = "/{id}")
-    public ResponseEntity<?> update(@RequestBody Product product, @PathVariable Integer id) {
+    public ResponseEntity<Object> update(@RequestBody ProductDto productDto, @PathVariable Integer id) {
         try {
             Product existProduct = service.get(id);
-            service.save(product);
+            existProduct.setName(productDto.getName());
+            existProduct.setPrice(productDto.getPrice());
+            service.update(existProduct);
             return new ResponseEntity<>(HttpStatus.OK);
         } catch (NoSuchElementException e) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
