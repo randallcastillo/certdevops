@@ -10,7 +10,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 @Controller
 public class GreetingController {
 
-    private static final String template = "Hello, %s!";
+    private static final String TEMPLATE = "Hello, %s!";
     private final AtomicLong counter = new AtomicLong();
 
     // returns the Greeting resource
@@ -18,6 +18,6 @@ public class GreetingController {
     @ResponseBody // tells Spring MVC not to render a model into a view but, rather, to write the
                   // returned object into the response body.
     public Greeting sayHello(@RequestParam(name = "name", required = false, defaultValue = "Stranger") String name) {
-        return new Greeting(counter.incrementAndGet(), String.format(template, name));
+        return new Greeting(counter.incrementAndGet(), String.format(TEMPLATE, name));
     }
 }
