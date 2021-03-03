@@ -1,7 +1,6 @@
 package com.certdevops.certdevops;
 
 import org.junit.jupiter.api.Test;
-
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.Map;
