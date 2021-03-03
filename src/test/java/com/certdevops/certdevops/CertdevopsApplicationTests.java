@@ -1,20 +1,32 @@
 package com.certdevops.certdevops;
 
 import org.junit.jupiter.api.Test;
-import org.springframework.boot.test.context.SpringBootTest;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import org.springframework.beans.factory.annotation.Autowired;
-
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.Map;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.web.client.TestRestTemplate;
 import org.springframework.boot.web.server.LocalServerPort;
+import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.test.context.TestPropertySource;
-
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestHeader;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import static org.assertj.core.api.BDDAssertions.then;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+import static org.assertj.core.api.Assertions.assertThat;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @TestPropertySource(properties = { "management.port=0" })
@@ -27,30 +39,39 @@ class CertdevopsApplicationTests {
 	private int mgt;
 
 	@Autowired
-	private HomeController controller;
-
-	@Autowired
 	private TestRestTemplate testRestTemplate;
 
+	private String baseUrl = "http://localhost:";
+
 	@Test
-	void contextLoads_HomeController() throws Exception {
-		assertThat(controller).isNotNull();
+    public void testAddProducSuccess() throws URISyntaxException 
+    {
+        URI uri = new URI(baseUrl + this.port + "/products");
+        Product product = new Product("PS4", 100);
+        HttpEntity<Product> request = new HttpEntity<>(product);
+        ResponseEntity<String> result = this.testRestTemplate.postForEntity(uri, request, String.class);
+        //Verify request succeed
+        assertEquals(201, result.getStatusCodeValue());
+    }
+
+	@Test
+	void shouldGetProduct() throws Exception {
+		@SuppressWarnings("rawtypes")
+		ResponseEntity<Map> entity = this.testRestTemplate.getForEntity(this.baseUrl + this.port + "/products/1", Map.class);
+		then(entity.getStatusCode()).isEqualTo(HttpStatus.OK);
 	}
 
 	@Test
 	void shouldReturn200WhenSendingRequestToController() throws Exception {
 		@SuppressWarnings("rawtypes")
-		ResponseEntity<Map> entity = this.testRestTemplate.getForEntity("http://localhost:" + this.port + "/greet",
-				Map.class);
+		ResponseEntity<Map> entity = this.testRestTemplate.getForEntity(this.baseUrl + this.port + "/greet", Map.class);
 		then(entity.getStatusCode()).isEqualTo(HttpStatus.OK);
 	}
 
 	@Test
 	void shouldReturn200WhenSendingRequestToManagementEndpoint() throws Exception {
 		@SuppressWarnings("rawtypes")
-		ResponseEntity<Map> entity = this.testRestTemplate
-				.getForEntity("http://localhost:" + this.mgt + "/actuator/info", Map.class);
+		ResponseEntity<Map> entity = this.testRestTemplate.getForEntity("http://localhost:" + this.mgt + "/actuator/info", Map.class);
 		then(entity.getStatusCode()).isEqualTo(HttpStatus.OK);
 	}
-
 }

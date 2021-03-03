@@ -57,8 +57,9 @@ public class ProductController {
 
     // RESTful API method for Delete operation
     @DeleteMapping(path = "/{id}")
-    public void delete(@PathVariable Integer id) {
+    public ResponseEntity<HttpStatus> delete(@PathVariable Integer id) {
         service.delete(id);
+        return new ResponseEntity<HttpStatus>(HttpStatus.ACCEPTED);
     }
 
 }
