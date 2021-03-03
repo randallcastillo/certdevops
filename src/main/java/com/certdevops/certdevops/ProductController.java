@@ -59,7 +59,7 @@ public class ProductController {
     @DeleteMapping(path = "/{id}")
     public ResponseEntity<HttpStatus> delete(@PathVariable Integer id) {
         service.delete(id);
-        return new ResponseEntity<HttpStatus>(HttpStatus.ACCEPTED);
+        return new ResponseEntity<>(HttpStatus.ACCEPTED);
     }
 
 }

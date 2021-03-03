@@ -35,7 +35,7 @@ class CertdevopsApplicationTests {
 	private String baseUrl = "http://localhost:";
 
 	@Test
-    public void testAddProducSuccess() throws URISyntaxException 
+    void testAddProducSuccess() throws URISyntaxException 
     {
         URI uri = new URI(baseUrl + this.port + "/products");
         Product product = new Product("PS4", 100);
