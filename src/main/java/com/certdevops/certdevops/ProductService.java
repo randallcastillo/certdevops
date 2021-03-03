@@ -16,6 +16,10 @@ public class ProductService {
         this.repo = productRepository;
     }
 
+    public String getProductName() {
+        return "Honey";
+     } 
+
     public Iterable<Product> listAll() {
         return repo.findAll();
     }

@@ -16,12 +16,6 @@ public class ProductController {
         this.service = productService;
     }
 
-
-    @GetMapping(path = "/hello")
-    public String sayHello() {
-        return "Hello Products!";
-    }
-
     // RESTful API methods for Retrieval operations
     @GetMapping
     public List<Product> list() {
@@ -63,8 +57,9 @@ public class ProductController {
 
     // RESTful API method for Delete operation
     @DeleteMapping(path = "/{id}")
-    public void delete(@PathVariable Integer id) {
+    public ResponseEntity<HttpStatus> delete(@PathVariable Integer id) {
         service.delete(id);
+        return new ResponseEntity<HttpStatus>(HttpStatus.ACCEPTED);
     }
 
 }
