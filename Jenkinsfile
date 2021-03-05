@@ -20,13 +20,25 @@ pipeline {
                 checkout scm
             }
         }
-        stage('Build') {
+        stage('Compile') {
             agent {
 		        docker {
 		            image 'maven:3-alpine' 
 		            args '-v /Users/rocastillou/.m2:/root/.m2' 
 		        }
-    		}  
+    		}
+            steps {
+                echo 'Compilar'
+                sh 'mvn clean compile'
+            }
+        }
+        stage('QA') {
+            agent {
+		        docker {
+		            image 'maven:3-alpine' 
+		            args '-v /Users/rocastillou/.m2:/root/.m2' 
+		        }
+    		}
             steps {
                 script {
                     branchName = ""
@@ -34,15 +46,12 @@ pipeline {
                         branchName = "-Dsonar.branch.name=${env.BRANCH_NAME}"
                     }
                  }
-                echo 'Compilar'
-                sh 'mvn clean compile'
                 echo "Valor para sonar.branch.name: ${branchName}"
 
                 echo 'Cobertura'
                 sh 'mvn org.jacoco:jacoco-maven-plugin:prepare-agent install -DfailIfNoTests=false' 
                 //jacoco execPattern: '**/target/**.exec'
                 junit '**/target/surefire-reports/*.xml'
-
 
                 echo 'Quality Gate'                
                 withSonarQubeEnv('SonarServer') {
@@ -52,7 +61,16 @@ pipeline {
 		       	timeout(time: 1, unit: 'MINUTES') { // Just in case something goes wrong, pipeline will be killed after a timeout
 	        		waitForQualityGate abortPipeline: true
 		       	}
-
+            }
+        }
+        stage('Build') {
+            agent {
+		        docker {
+		            image 'maven:3-alpine' 
+		            args '-v /Users/rocastillou/.m2:/root/.m2' 
+		        }
+    		}  
+            steps {
                 echo 'Build'
 	       		sh 'mvn clean package -Dmaven.test.skip=true' 
             }
