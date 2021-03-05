@@ -26,7 +26,19 @@ pipeline {
 		            image 'maven:3-alpine' 
 		            args '-v /Users/rocastillou/.m2:/root/.m2' 
 		        }
-    		}  
+    		}
+            steps {
+                echo 'Compilar'
+                sh 'mvn clean compile'
+            }
+        }
+        stage('QA') {
+            agent {
+		        docker {
+		            image 'maven:3-alpine' 
+		            args '-v /Users/rocastillou/.m2:/root/.m2' 
+		        }
+    		}
             steps {
                 script {
                     branchName = ""
@@ -34,8 +46,6 @@ pipeline {
                         branchName = "-Dsonar.branch.name=${env.BRANCH_NAME}"
                     }
                  }
-                echo 'Compilar'
-                sh 'mvn clean compile'
                 echo "Valor para sonar.branch.name: ${branchName}"
 
                 echo 'Cobertura'
