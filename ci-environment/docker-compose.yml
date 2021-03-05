@@ -33,11 +33,6 @@ services:
       - ./volumes/sonarqube/data:/opt/sonarqube/data
       - ./volumes/sonarqube/logs:/opt/sonarqube/logs
       - ./volumes/sonarqube/extensions:/opt/sonarqube/extensions
-    #   - C:\Users\randall\sonarqube-community-branch-plugin-1.6.0.jar:/opt/sonarqube/extensions/downloads/sonarqube-community-branch-plugin-1.6.0.jar
-    #   - C:\Users\randall\sonarqube-community-branch-plugin-1.6.0.jar:/opt/sonarqube/lib/common/sonarqube-community-branch-plugin-1.6.0.jar
-    # command: >
-    #   bash -c "chmod 777 /opt/sonarqube/lib/common/
-    #   && chmod 777 /opt/sonarqube/extensions/downloads/"
     networks:
       - ci-network
     environment:
