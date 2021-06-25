@@ -33,6 +33,12 @@ pipeline {
             }
         }
         stage('Test') {
+            agent {
+		        docker {
+		            image 'maven:3-alpine' 
+		            args '-v /Users/rocastillou/.m2:/root/.m2' 
+		        }
+    		}
             steps {
                 sh 'mvn test'
             }
