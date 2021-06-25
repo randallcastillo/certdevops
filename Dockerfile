@@ -4,6 +4,6 @@ COPY target/*.jar /home/certdevops/certdevops.jar
 
 WORKDIR /home/certdevops/
 
-EXPOSE 8080
+EXPOSE 9997
 
 CMD [ "java", "-jar", "certdevops.jar" ]
