@@ -14,6 +14,13 @@ pipeline {
     }
     stages {
 
+        stage ('Start') {
+            agent any
+            steps {
+                // send build started notifications
+                notifyBuild()
+            }
+        }
         stage('Checkout') {
             agent any
             steps {
@@ -87,42 +94,27 @@ pipeline {
             }
         }
     }
-    post { 
-        // only triggered when blue or green sign
-        success {
-            notifyBuild(SUCCESSFUL)
-        }
-        // triggered when red sign
-        failure {
-            notifyBuild('FAILED')
-        }
-        // trigger every-works
+    post {
         always {
-            notifyBuild('STARTED')
+            notifyBuild(currentBuild.currentResult)
         }
     }
 }
 
 def notifyBuild(String buildStatus = 'STARTED') {
-  // build status of null means successful
-  buildStatus =  buildStatus ?: 'SUCCESSFUL'
-
   // Default values
-  def colorName = 'RED'
-  def colorCode = '#FF0000'
   def subject = "${buildStatus}: Job '${env.JOB_NAME} [${env.BUILD_NUMBER}]'"
   def summary = "${subject} (${env.BUILD_URL})"
 
   // Override default values based on build status
-  if (buildStatus == 'STARTED') {
-    color = 'YELLOW'
-    colorCode = '#FFFF00'
-  } else if (buildStatus == 'SUCCESSFUL') {
-    color = 'GREEN'
-    colorCode = '#00FF00'
+  if (buildStatus == 'SUCCESS') { 
+    colorCode = 'good' // GREEN
+  } else if (buildStatus == 'UNSTABLE' || buildStatus == 'STARTED') {
+    colorCode = 'warning' // YELLOW
+  } else if (buildStatus == 'FAILURE') {
+    colorCode = 'danger' // RED
   } else {
-    color = 'RED'
-    colorCode = '#FF0000'
+    colorCode = 'danger' // RED
   }
 
   // Send notifications
