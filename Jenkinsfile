@@ -80,12 +80,11 @@ pipeline {
             agent any
             steps {
                 script {
-
                     if (env.BRANCH_NAME.equals("main")) {
                         docker.withRegistry( '', registryCredential ) {
                             dockerImage.push('latest')
                         }
-                        sh "docker rmi " + ${registry} + "latest"
+                        sh "docker rmi ${registry}latest"
                     } else {
                         docker.withRegistry( '', registryCredential ) {
                             dockerImage.push()
