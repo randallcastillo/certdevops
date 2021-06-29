@@ -63,18 +63,16 @@ pipeline {
         }
         stage('Deploy') {
             agent any
-            environment {
-                version = ""
-                if ( env.BRANCH_NAME.equals("main") ) {
-                    version = ":$BUILD_NUMBER"
-                } else {
-                    version = ":" + env.BRANCH_NAME.replace("/", "-") + "-$BUILD_NUMBER"
-                }
-            }
             stages {
                 stage('Build Docker Image') {
                     steps {
                         script {
+                            if ( env.BRANCH_NAME.equals("main") ) {
+                                version = ":$BUILD_NUMBER"
+                            } else {
+                                version = ":" + env.BRANCH_NAME.replace("/", "-") + "-$BUILD_NUMBER"
+                            }
+
                             dockerImageName = registry + version
                             dockerImage = docker.build "${dockerImageName}"
                         }
