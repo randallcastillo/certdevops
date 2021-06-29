@@ -90,8 +90,8 @@ pipeline {
                         docker.withRegistry( '', registryCredential ) {
                             dockerImage.push()
                         }
-                        sh "docker rmi $registry$version" 
                     }
+                    sh "docker rmi $registry$version" 
                 }
             }
         }
