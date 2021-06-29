@@ -12,9 +12,9 @@ pipeline {
         timestamps()
         skipDefaultCheckout() // Don't checkout automatically
     }
-
-    stages {
-        try {
+    try {
+        stages {
+        
             notifyBuild('STARTED')
 
             stage('Checkout') {
@@ -89,14 +89,14 @@ pipeline {
                                 
                 }
             }
-        } catch (e) {
-            // If there was an exception thrown, the build failed
-            currentBuild.result = "FAILED"
-            throw e
-        } finally {
-            // Success or failure, always send notifications
-            notifyBuild(currentBuild.result)
         }
+    } catch (e) {
+        // If there was an exception thrown, the build failed
+        currentBuild.result = "FAILED"
+        throw e
+    } finally {
+        // Success or failure, always send notifications
+        notifyBuild(currentBuild.result)
     }
 
 }
