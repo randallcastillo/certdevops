@@ -61,42 +61,39 @@ pipeline {
                 sh 'mvn clean package -Dmaven.test.skip=true' 
             }
         }
-        stage('Deploy') {
+        stage('Build Docker Image') {
             agent any
-            stages {
-                stage('Build Docker Image') {
-                    steps {
-                        script {
-                            if ( env.BRANCH_NAME.equals("main") ) {
-                                version = ":$BUILD_NUMBER"
-                            } else {
-                                version = ":" + env.BRANCH_NAME.replace("/", "-") + "-$BUILD_NUMBER"
-                            }
-
-                            dockerImageName = registry + version
-                            dockerImage = docker.build "${dockerImageName}"
-                        }
+            steps {
+                script {
+                    if ( env.BRANCH_NAME.equals("main") ) {
+                        version = ":$BUILD_NUMBER"
+                    } else {
+                        version = ":" + env.BRANCH_NAME.replace("/", "-") + "-$BUILD_NUMBER"
                     }
-                }
-                stage('Deploy to Docker Hub') {
-                    steps {
-                        script {
-                            docker.withRegistry( '', registryCredential ) {
-                                dockerImage.push()
-                            }
 
-                            if (env.BRANCH_NAME.equals("main")) {
-                                docker.withRegistry( '', registryCredential ) {
-                                    dockerImage.push('latest')
-                                }
-                                sh "docker rmi " + ${registry} + "latest"
-                            }
-                            sh "docker rmi $registry$version"
+                    dockerImageName = registry + version
+                    dockerImage = docker.build "${dockerImageName}"
+                }
+            }
+        }
+        stage('Deploy to Docker Hub') {
+            agent any
+            steps {
+                script {
+
+                    if (env.BRANCH_NAME.equals("main")) {
+                        docker.withRegistry( '', registryCredential ) {
+                            dockerImage.push('latest')
                         }
+                        sh "docker rmi " + ${registry} + "latest"
+                    } else {
+                        docker.withRegistry( '', registryCredential ) {
+                            dockerImage.push()
+                        }
+                        sh "docker rmi $registry$version" 
                     }
                 }
             }
-
         }
     }
     post {
