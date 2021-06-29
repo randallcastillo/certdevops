@@ -1,0 +1,107 @@
+version: '3'
+
+services:
+  postgres:
+    image: postgres
+    container_name: postgres
+    volumes:
+       - ./volumes/postgres/sql:/var/lib/postgresql
+       - ./volumes/postgres/data:/var/lib/postgresql/data
+    networks:
+      - ci-network
+    environment:
+      - POSTGRES_USER=sonaruser
+      - POSTGRES_PASSWORD=sonar1234
+      - POSTGRES_DB=sonarqube
+    restart: always        
+    ports:
+      - '5432:5432'
+
+  admin:
+    image: adminer
+    container_name: admin
+    restart: always
+    networks:
+      - ci-network
+    ports:
+      - '9080:8080'  
+      
+  sonarqube:
+    image: sonarqube:8.5.1-community
+    container_name: sonarqube
+    volumes:
+      - ./volumes/sonarqube/data:/opt/sonarqube/data
+      - ./volumes/sonarqube/logs:/opt/sonarqube/logs
+      - ./volumes/sonarqube/extensions:/opt/sonarqube/extensions
+    networks:
+      - ci-network
+    environment:
+      - SONAR_JDBC_URL=jdbc:postgresql://postgres:5432/sonarqube
+      - SONAR_JDBC_USERNAME=sonaruser
+      - SONAR_JDBC_PASSWORD=sonar1234
+    restart: always
+    ports:
+      - '9000:9000'
+
+  jenkins:
+    image: jenkinsci/blueocean
+    container_name: jenkins
+    user: root
+    volumes:
+       - ./volumes/jenkins:/var/jenkins_home
+       - /var/run/docker.sock:/var/run/docker.sock
+    networks:
+      - ci-network
+    restart: always  
+    ports:
+      - '8080:8080'
+      - '50000:50000'
+
+  gitea:
+    image: gitea/gitea
+    container_name: gitea
+    volumes:
+      - ./volumes/gitea:/data    
+    environment:
+      - USER_UID=1000
+      - USER_GID=1000
+      - DB_TYPE=mysql
+      - DB_HOST=db:3306
+      - DB_NAME=gitea
+      - DB_USER=gitea
+      - DB_PASSWD=gitea
+    restart: always
+    networks:
+      - ci-network
+    ports:
+       - '3000:3000'
+       - '222:22'
+    expose:
+      - '3000'
+    depends_on:
+      - mysql  
+      
+  mysql:
+    image: mysql:5.7
+    command: --default-authentication-plugin=mysql_native_password
+    container_name: mysql
+    restart: always
+    environment:
+      - MYSQL_ROOT_PASSWORD=gitea
+      - MYSQL_ROOT_HOST='%'
+      - MYSQL_USER=gitea
+      - MYSQL_PASSWORD=gitea
+      - MYSQL_DATABASE=gitea
+    networks:
+      - ci-network
+    ports:
+      - "3306:3306"
+    expose:
+      - '3306'
+    volumes:
+      - ./.docker/init-products.sql:/docker-entrypoint-initdb.d/init-products.sql
+      - ./volumes/mysql:/var/lib/mysql
+      
+networks:
+  ci-network:
+    driver: bridge
