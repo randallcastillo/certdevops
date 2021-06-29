@@ -64,6 +64,7 @@ pipeline {
         stage('Deploy') {
             agent any
             environment {
+                version = ""
                 if ( env.BRANCH_NAME.equals("main") ) {
                     version = ":$BUILD_NUMBER"
                 } else {
