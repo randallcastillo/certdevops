@@ -13,7 +13,6 @@ pipeline {
         skipDefaultCheckout() // Don't checkout automatically
     }
     stages {
-
         stage ('Start') {
             agent any
             steps {
@@ -50,7 +49,7 @@ pipeline {
                 sh 'mvn test'
             }
         }
-        stage('Build') {
+        stage('Build App') {
             agent {
                 docker {
                     image 'maven:3-alpine' 
@@ -62,36 +61,43 @@ pipeline {
                 sh 'mvn clean package -Dmaven.test.skip=true' 
             }
         }
-        stage('Build Docker Image') { 
+        stage('Deploy') {
             agent any
-            steps {
-                script {
-
-                    if ( env.BRANCH_NAME.equals("main") ) {
-                        version = ":$BUILD_NUMBER"
-                    } else {
-                        version = ":" + env.BRANCH_NAME.replace("/", "-") + "-$BUILD_NUMBER"
-                    }
-
-                    dockerImageName = registry + version
-                    dockerImage = docker.build "${dockerImageName}"
-                    docker.withRegistry( '', registryCredential ) {
-                        dockerImage.push()
-                    }
-
-                    if (env.BRANCH_NAME.equals("master")) {
-                        docker.withRegistry( '', registryCredential ) {
-                            dockerImage.push('latest')
-                        }
-                        sh "docker rmi " + ${registry} + "latest"
-                    }
-                    sh "docker rmi $registry$version"
-
-                    slackSend color: "good", message: "La imagen se ha publicado satisfactoriamente en Docker Hub"
-                } 
-                
-                            
+            environment {
+                if ( env.BRANCH_NAME.equals("main") ) {
+                    version = ":$BUILD_NUMBER"
+                } else {
+                    version = ":" + env.BRANCH_NAME.replace("/", "-") + "-$BUILD_NUMBER"
+                }
             }
+            stages {
+                stage('Build Docker Image') {
+                    steps {
+                        script {
+                            dockerImageName = registry + version
+                            dockerImage = docker.build "${dockerImageName}"
+                        }
+                    }
+                }
+                stage('Deploy to Docker Hub') {
+                    steps {
+                        script {
+                            docker.withRegistry( '', registryCredential ) {
+                                dockerImage.push()
+                            }
+
+                            if (env.BRANCH_NAME.equals("main")) {
+                                docker.withRegistry( '', registryCredential ) {
+                                    dockerImage.push('latest')
+                                }
+                                sh "docker rmi " + ${registry} + "latest"
+                            }
+                            sh "docker rmi $registry$version"
+                        }
+                    }
+                }
+            }
+
         }
     }
     post {
